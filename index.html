@@ -254,7 +254,7 @@
             initializeOrderFulfillmentEngine();
             initializeFeedbackEngine();
             fetchAnnouncements();
-            fetchSystemSettings(); // NEW EXTENSION
+            fetchSystemSettings(); 
             await checkUserSession();
             
             const root = document.documentElement;
@@ -263,7 +263,6 @@
             });
         });
 
-        // --- NEW EXTENSION: Live Users Tracking ---
         async function fetchSystemSettings() {
             if(!window.supabase) return;
             const { data } = await window.supabase.from('system_settings').select('*').eq('setting_key', 'displayed_online_users').single();
@@ -273,7 +272,6 @@
             }
         }
 
-        // --- Auth & User Profile Logic ---
         async function checkUserSession() {
             if(!window.supabase) return;
             const { data: { session } } = await window.supabase.auth.getSession();
@@ -308,7 +306,6 @@
             document.getElementById('auth-user-name').innerText = name;
         }
 
-        // --- Auth Modals & Forms ---
         function openAuthModal(mode) {
             document.getElementById('auth-mode').value = mode;
             document.getElementById('auth-title').innerText = mode === 'login' ? 'Sign In' : 'Register';
@@ -384,7 +381,6 @@
             showToast("Logged out.");
         }
 
-        // --- EXTENSION: Shared Profile Image Upload Function ---
         async function handleProfileUpload(fileInput) {
             if (fileInput.files.length === 0) return null;
             const file = fileInput.files[0];
@@ -403,7 +399,6 @@
             return publicUrlData.publicUrl;
         }
 
-        // 1. Initial Setup Avatar Upload
         document.getElementById('profile-completion-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
@@ -414,7 +409,6 @@
             } catch(err) { alert("Error uploading avatar: " + err.message); }
         });
 
-        // 2. Dashboard Avatar Update (NEW EXTENSION)
         document.getElementById('dash-avatar-update-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
@@ -432,7 +426,6 @@
             }
         });
 
-        // --- User Dashboard Logic (EXTENDED) ---
         async function openUserDashboard() {
             if(!currentUserProfile) return;
             document.getElementById('dash-name').innerText = currentUserProfile.full_name || 'N/A';
@@ -450,7 +443,6 @@
             if(orders && orders.length > 0) {
                 orders.forEach(o => {
                     const date = new Date(o.created_at).toLocaleDateString();
-                    // Status styling logic for proper read-only tracking
                     let statusColor = '#64748b';
                     if(o.status === 'Processing') statusColor = 'var(--warning)';
                     if(o.status === 'Shipped') statusColor = 'var(--accent)';
@@ -471,41 +463,50 @@
         }
         function closeUserDashboard() { document.getElementById('user-dashboard-modal').classList.remove('active'); }
 
-        // --- Announcements Logic (EXTENDED) ---
+        // --- UPDATED: Announcements Logic with Error Tracking ---
         async function fetchAnnouncements() {
-            const { data, error } = await window.supabase.from('announcements').select('*').eq('active', true).order('created_at', { ascending: false });
-            if (error || !data || data.length === 0) return;
-
-            // 1. Keep Top Emergency Banner for latest simple text (Optional legacy behavior)
-            const banner = document.getElementById('dynamic-announcement');
-            banner.innerText = data[0].content;
-            banner.classList.add('active');
-
-            // 2. Render Full Feed Section Below Hero
-            const feedContainer = document.getElementById('public-announcements-container');
-            const feedSection = document.getElementById('public-announcements-feed');
-            
-            feedSection.style.display = 'block'; // Make section visible
-            feedContainer.innerHTML = ''; // Clear
-
-            data.forEach(a => {
-                const imgBlock = a.image_url ? `<img src="${a.image_url}" alt="Announcement Graphic">` : '';
-                const dateStr = new Date(a.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+            try {
+                const { data, error } = await window.supabase.from('announcements').select('*').eq('active', true).order('created_at', { ascending: false });
                 
-                const card = document.createElement('div');
-                card.className = 'public-feed-card';
-                card.innerHTML = `
-                    ${imgBlock}
-                    <div style="flex-grow: 1;">
-                        <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.25rem; display:block;">${dateStr}</span>
-                        <p style="font-size:1rem; color:var(--text-main); line-height:1.7;">${escapeHTML(a.content)}</p>
-                    </div>
-                `;
-                feedContainer.appendChild(card);
-            });
+                // If there's an RLS database error, log it to the console so we can see it
+                if (error) throw error;
+                
+                const banner = document.getElementById('dynamic-announcement');
+                const feedContainer = document.getElementById('public-announcements-container');
+                const feedSection = document.getElementById('public-announcements-feed');
+
+                if (!data || data.length === 0) {
+                    banner.classList.remove('active');
+                    feedSection.style.display = 'none';
+                    return;
+                }
+
+                banner.innerText = data[0].content;
+                banner.classList.add('active');
+
+                feedSection.style.display = 'block'; 
+                feedContainer.innerHTML = ''; 
+
+                data.forEach(a => {
+                    const imgBlock = a.image_url ? `<img src="${a.image_url}" alt="Announcement Graphic">` : '';
+                    const dateStr = new Date(a.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                    
+                    const card = document.createElement('div');
+                    card.className = 'public-feed-card';
+                    card.innerHTML = `
+                        ${imgBlock}
+                        <div style="flex-grow: 1;">
+                            <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.25rem; display:block;">${dateStr}</span>
+                            <p style="font-size:1rem; color:var(--text-main); line-height:1.7;">${escapeHTML(a.content)}</p>
+                        </div>
+                    `;
+                    feedContainer.appendChild(card);
+                });
+            } catch (err) {
+                console.error("Supabase Announcements Blocked/Error:", err.message);
+            }
         }
 
-        // --- Public Catalog & Support Form Logic ---
         window.viewDetails = (id) => {
             const prod = localProductsCache.find(p => p.id === id);
             if(prod) {
@@ -703,6 +704,7 @@
             document.getElementById("currency-select").addEventListener("change", () => renderCatalogGrid(localProductsCache));
         }
 
+        // --- UPDATED: Added Realtime Listeners for Announcements ---
         function initializeRealtimeCatalogUpdates() {
             window.supabase.channel('public-products-channel')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
@@ -711,6 +713,11 @@
                         localProductsCache = data;
                         document.getElementById("search-input").dispatchEvent(new Event("input"));
                     }
+                }).subscribe();
+
+            window.supabase.channel('public-announcements-channel')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => {
+                    fetchAnnouncements();
                 }).subscribe();
         }
     </script>
