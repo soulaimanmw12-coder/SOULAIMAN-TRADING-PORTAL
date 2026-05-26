@@ -480,7 +480,7 @@
                 <h4>Quick Links</h4>
                 <ul>
                     <li><a href="#">Commodities Catalog</a></li>
-                    <li><a href="#">Logistics & Routing</a></li>
+                    <li><a href="#">Together we can</a></li>
                     <li><a href="#">Partner Network</a></li>
                     <li><a href="#">Corporate Governance</a></li>
                 </ul>
@@ -498,8 +498,8 @@
                 <h4>Contact Terminal</h4>
                 <ul style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.8;">
                     <li><strong>Base:</strong> Kigali, Rwanda</li>
-                    <li><strong>Comms:</strong> +250 780 000 000</li>
-                    <li><strong>Grid:</strong> ops@mwamini.com</li>
+                    <li><strong>Comms:</strong> +250 785696336</li>
+                    <li><strong>Grid:</strong> soulaimanmwamini0@gmail.com</li>
                 </ul>
             </div>
         </div>
@@ -960,13 +960,13 @@
                     const { error } = await window.supabase.from('reviews').insert([payload]);
                     if (error) throw error;
                     
-                    showToast("Review transmitted successfully.");
+                    showToast("Review successfully.");
                     e.target.reset();
                 } catch (err) { 
                     alert(`Routing failed: ${err.message}`); 
                 } finally { 
                     btn.disabled = false; 
-                    btn.innerText = "Submit Platform Review"; 
+                    btn.innerText = "Submit Review"; 
                 }
             });
 
