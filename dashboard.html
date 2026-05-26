@@ -8,29 +8,40 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --dash-blue-deep: #1e3a8a;
+            --dash-blue-deep: #0f172a;
             --dash-blue-accent: #2563eb;
-            --dash-blue-light: #eff6ff;
-            --dash-bg-card: #ffffff;
-            --dash-border: #e2e8f0;
+            --dash-blue-glow: #3b82f6;
+            --dash-blue-light: #f0f6ff;
+            --dash-bg-card: rgba(255, 255, 255, 0.85);
+            --dash-border: rgba(226, 232, 240, 0.8);
             --dash-text: #0f172a;
             --dash-muted: #64748b;
             --dash-red: #ef4444;
+            --dash-red-hover: #dc2626;
             --dash-green: #10b981;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --luxury-gradient: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
         }
 
         [data-theme="dark"] {
-            --dash-blue-deep: #0f172a;
+            --dash-blue-deep: #020617;
             --dash-blue-accent: #3b82f6;
+            --dash-blue-glow: #60a5fa;
             --dash-blue-light: #1e293b;
-            --dash-bg-card: #1e293b;
-            --dash-border: #334155;
+            --dash-bg-card: rgba(30, 41, 59, 0.85);
+            --dash-border: rgba(51, 65, 85, 0.8);
             --dash-text: #f8fafc;
             --dash-muted: #94a3b8;
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --luxury-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-primary);
             color: var(--dash-text);
             margin: 0;
@@ -38,67 +49,85 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
+
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .dashboard-container {
             display: flex;
             flex: 1;
-            min-height: calc(100vh - 70px);
+            min-height: calc(100vh - 75px);
             position: relative;
         }
 
-        /* Sidebar Navigation styling */
+        /* Modern Sidebar Navigation */
         .dash-sidebar {
-            width: 280px;
-            background: var(--dash-bg-card);
-            border-right: 1px solid var(--dash-border);
-            padding: 2rem 1.5rem;
+            width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid var(--glass-border);
+            padding: 2.5rem 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
             z-index: 10;
         }
 
         .dash-nav-btn {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             width: 100%;
-            padding: 1rem 1.25rem;
+            padding: 1.1rem 1.4rem;
             background: transparent;
             border: 1px solid transparent;
-            border-radius: 12px;
+            border-radius: 14px;
             color: var(--dash-text);
             font-weight: 600;
             font-size: 14px;
             text-align: left;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .dash-nav-btn:hover {
             background: var(--dash-blue-light);
             color: var(--dash-blue-accent);
+            transform: translateX(4px);
         }
 
         .dash-nav-btn.active {
-            background: var(--dash-blue-deep) !important;
+            background: var(--luxury-gradient) !important;
             color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.15);
+            box-shadow: 0 8px 20px -6px rgba(37, 99, 235, 0.4);
         }
 
-        /* Main Area Layout */
+        /* Content Mainframe Window */
         .dash-main-content {
             flex: 1;
-            padding: 2.5rem;
+            padding: 3rem;
             overflow-y: auto;
             position: relative;
-            background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(248,250,252,0.5) 100%);
+            background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(248,250,252,0.3) 100%);
         }
 
         .dash-panel {
             display: none;
-            animation: dashFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: dashFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .dash-panel.active-panel {
@@ -106,94 +135,193 @@
         }
 
         @keyframes dashFadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Luxury Metric Cards */
+        /* Glassmorphic Premium Components */
+        .luxury-card {
+            background: var(--dash-bg-card);
+            border: 1px solid var(--dash-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            margin-bottom: 2.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .luxury-card:hover {
+            box-shadow: 0 15px 35px -5px rgba(0,0,0,0.06);
+        }
+
+        /* Welcome Terminal Node */
+        .welcome-widget {
+            background: var(--luxury-gradient);
+            color: white;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-widget::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            top: -100px;
+            right: -50px;
+        }
+
+        .user-avatar-wrapper {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .user-avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Notification Cluster Center */
+        .notification-tray {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 1.2rem;
+            border-radius: 16px;
+            background: rgba(239, 68, 68, 0.06);
+            border-left: 5px solid var(--dash-red);
+            font-size: 14px;
+            animation: pulseAlert 3s infinite alternate;
+        }
+
+        @keyframes pulseAlert {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.05); }
+            100% { box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.12); }
+        }
+
+        /* Metric Architecture Grid */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
         }
 
         .metric-card {
             background: var(--dash-bg-card);
             border: 1px solid var(--dash-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
             position: relative;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
         }
 
         .metric-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
+            top: 0; left: 0; width: 5px; height: 100%;
             background: var(--dash-blue-accent);
         }
 
-        /* Garden Integration Frame */
+        .metric-card.alert-metric::before {
+            background: var(--dash-red);
+        }
+
+        /* Advanced Biological Canvas Environment */
         .garden-container-card {
             background: var(--dash-bg-card);
             border: 1px solid var(--dash-border);
-            border-radius: 20px;
+            border-radius: 28px;
             overflow: hidden;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02);
-            position: relative;
+            margin-bottom: 3rem;
+            box-shadow: var(--card-shadow);
         }
 
         #garden-canvas {
             width: 100%;
-            height: 220px;
+            height: 300px;
             background: linear-gradient(180deg, #f0f7ff 0%, #e0f2fe 100%);
             display: block;
             transition: filter 0.5s ease;
         }
 
         [data-theme="dark"] #garden-canvas {
-            background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
-            filter: brightness(0.8) contrast(1.1);
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
         }
 
         .garden-controls-overlay {
-            padding: 1rem 1.5rem;
-            background: var(--dash-bg-card);
+            padding: 1.5rem 2.5rem;
+            background: var(--glass-bg);
             border-top: 1px solid var(--dash-border);
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
-        /* Pipeline Order Tracking Visualizer */
+        .music-dock {
+            background: var(--dash-bg-card);
+            border: 1px solid var(--dash-border);
+            border-radius: 16px;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* Pipeline Workflow Step Architecture */
         .pipeline-tracker {
             display: flex;
             justify-content: space-between;
             position: relative;
-            margin: 2.5rem 0;
-            padding: 0 1rem;
+            margin: 3.5rem 0 2rem;
+            padding: 0 1.5rem;
         }
 
         .pipeline-tracker::before {
             content: '';
             position: absolute;
-            top: 15px; left: 0; width: 100%; height: 4px;
+            top: 18px; left: 0; width: 100%; height: 5px;
             background: var(--dash-border);
             z-index: 1;
         }
 
         .pipeline-progress-line {
             position: absolute;
-            top: 15px; left: 0; height: 4px;
-            background: var(--dash-blue-accent);
+            top: 18px; left: 0; height: 5px;
+            background: var(--luxury-gradient);
             z-index: 2;
             width: 0%;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .pipeline-step {
@@ -202,135 +330,209 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center;
             flex: 1;
         }
 
         .pipeline-node {
-            width: 34px;
-            height: 34px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--dash-bg-card);
-            border: 3px solid var(--dash-border);
+            border: 4px solid var(--dash-border);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 14px;
             color: var(--dash-muted);
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .pipeline-step.completed .pipeline-node {
             background: var(--dash-blue-accent);
             border-color: var(--dash-blue-accent);
             color: #ffffff;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
         }
 
         .pipeline-step.active .pipeline-node {
             background: #ffffff;
             border-color: var(--dash-blue-deep);
             color: var(--dash-blue-deep);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+            box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.2);
+            transform: scale(1.1);
         }
 
         .pipeline-label {
-            margin-top: 8px;
+            margin-top: 12px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--dash-text);
         }
 
-        /* Music Floating Dock */
-        .music-dock {
-            background: var(--dash-bg-card);
-            border: 1px solid var(--dash-border);
-            border-radius: 12px;
-            padding: 0.75rem 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        /* Tables & Directories */
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
         }
 
-        /* Live Feedback Feed Cards */
+        .dashboard-table th {
+            background: var(--dash-blue-light);
+            color: var(--dash-blue-deep);
+            padding: 1.2rem;
+            font-weight: 700;
+        }
+
+        .dashboard-table td {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--dash-border);
+            color: var(--dash-text);
+        }
+
+        .dashboard-table tr:hover td {
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        /* User Activity Vertical Timeline */
+        .activity-timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .activity-timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px; top: 0; width: 2px; height: 100%;
+            background: var(--dash-border);
+        }
+
+        .timeline-event {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -31px; top: 4px; width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--dash-blue-accent);
+            border: 3px solid var(--dash-bg-card);
+        }
+
+        .timeline-event.crit-event::before {
+            background: var(--dash-red);
+        }
+
+        /* Real-Time Social Comment Stream Nodes */
         .comment-stream {
-            max-height: 320px;
+            max-height: 400px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
             padding-right: 0.5rem;
         }
 
         .comment-node {
             background: var(--dash-blue-light);
-            border-radius: 12px;
-            padding: 1rem;
+            border-radius: 18px;
+            padding: 1.5rem;
             border: 1px solid var(--dash-border);
-            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .comment-node:hover {
+            transform: translateY(-2px);
         }
 
         .reaction-row {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 10px;
+            margin-top: 1rem;
         }
 
         .react-pill {
             background: var(--dash-bg-card);
             border: 1px solid var(--dash-border);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .react-pill:hover {
             border-color: var(--dash-blue-accent);
-            background: var(--dash-blue-light);
+            background: rgba(37, 99, 235, 0.05);
+            transform: scale(1.05);
         }
 
-        /* Grid Configuration */
-        .dashboard-split-grid {
+        /* Business Tools & Quick Actions Grid */
+        .quick-actions-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .action-card-btn {
+            background: var(--dash-blue-light);
+            border: 1px solid var(--dash-border);
+            padding: 1.25rem;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            color: var(--dash-blue-accent);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .action-card-btn:hover {
+            background: var(--luxury-gradient);
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Form Controls */
+        .search-input {
+            background: var(--dash-bg-card);
+            border: 1px solid var(--dash-border);
+            color: var(--dash-text);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--dash-blue-accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         .form-grid-two-col {
             display: grid;
-            grid-template-columns: 1xl 1xl;
-            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
         }
 
-        .settings-card {
-            background: var(--dash-bg-card);
-            border: 1px solid var(--dash-border);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .toggle-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--dash-border);
-        }
-
-        /* Utility Switch button */
+        /* Configuration Utility Switch button */
         .switch-toggle {
             position: relative;
             display: inline-block;
-            width: 44px;
-            height: 24px;
+            width: 50px;
+            height: 28px;
         }
 
         .switch-toggle input { opacity: 0; width: 0; height: 0; }
@@ -338,59 +540,94 @@
         .slider-round {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--dash-border);
-            transition: .3s; border-radius: 24px;
+            transition: .3s; border-radius: 30px;
         }
 
         .slider-round:before {
-            position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px;
+            position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px;
             background-color: white; transition: .3s; border-radius: 50%;
         }
 
         input:checked + .slider-round { background-color: var(--dash-blue-accent); }
-        input:checked + .slider-round:before { transform: translateX(20px); }
+        input:checked + .slider-round:before { transform: translateX(22px); }
+
+        .live-users-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--dash-green);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-users-pulse {
+            width: 8px; height: 8px; background: var(--dash-green); border-radius: 50%;
+            animation: pulseSignal 1.5s infinite;
+        }
+
+        @keyframes pulseSignal {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        /* Widgets Container Layout */
+        .dashboard-split-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-split-grid { grid-template-columns: 1fr; }
+        }
 
         @media (max-width: 992px) {
             .dashboard-container { flex-direction: column; }
-            .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--dash-border); flex-direction: row; overflow-x: auto; }
-            .dash-nav-btn { width: auto; white-space: nowrap; }
-            .dashboard-split-grid { grid-template-columns: 1fr; }
+            .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--glass-border); flex-direction: row; overflow-x: auto; padding: 1.5rem; }
+            .dash-nav-btn { width: auto; white-space: nowrap; padding: 0.8rem 1.2rem; }
+            .form-grid-two-col { grid-template-columns: 1fr; }
+            .dash-main-content { padding: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <header style="background: var(--glass-bg); backdrop-filter: blur(16px);">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="https://sdxtdkroyolagmjaipgw.supabase.co/storage/v1/object/public/product-assets/Company%20logo.jpg" alt="Mwamini Logo" style="height: 40px; border-radius: 4px; filter: invert(1);">
-            <div class="brand-title">MWAMINI TELEMETRY</div>
+    <header>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <img src="https://sdxtdkroyolagmjaipgw.supabase.co/storage/v1/object/public/product-assets/Company%20logo.jpg" alt="Mwamini Logo" style="height: 45px; border-radius: 8px; filter: invert(0.1);">
+            <div class="brand-title" style="letter-spacing: 1px; font-weight: 800;">MWAMINI TELEMETRY</div>
         </div>
         <div style="display: flex; gap: 1.5rem; align-items: center;">
             <div class="live-users-badge">
                 <div class="live-users-pulse"></div>
-                <span>Session Active</span>
+                <span>Mainframe Linked</span>
             </div>
-            <button id="theme-toggle" class="btn" style="padding:0.5rem 1rem; background: var(--border-color); color: var(--text-main);">Theme</button>
-            <button onclick="logoutMainframe()" class="btn" style="background: var(--danger); color: white; padding: 0.5rem 1rem;">Terminate Session</button>
+            <button id="theme-toggle" class="btn" style="padding:0.6rem 1.2rem; background: var(--dash-blue-light); color: var(--dash-blue-accent); font-weight:700;">Theme</button>
+            <button onclick="logoutMainframe()" class="btn" style="background: var(--dash-red); color: white; padding: 0.6rem 1.2rem; font-weight:700; border:none; border-radius:10px; cursor:pointer;">Terminate Session</button>
         </div>
     </header>
 
     <div class="dashboard-container">
         <aside class="dash-sidebar">
-            <button class="dash-nav-btn active" onclick="switchPanel('analytics')">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+            <button class="dash-nav-btn active" id="nav-analytics" onclick="switchPanel('analytics')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
                 Core Analytics Ecosystem
             </button>
-            <button class="dash-nav-btn" onclick="switchPanel('orders')">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <button class="dash-nav-btn" id="nav-orders" onclick="switchPanel('orders')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                 Order Management Log
             </button>
-            <button class="dash-nav-btn" onclick="switchPanel('social')">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <button class="dash-nav-btn" id="nav-social" onclick="switchPanel('social')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 Social Activity Node
             </button>
-            <button class="dash-nav-btn" onclick="switchPanel('settings')">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                Account Parameter matrix
+            <button class="dash-nav-btn" id="nav-settings" onclick="switchPanel('settings')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Account Parameter Matrix
             </button>
         </aside>
 
@@ -399,241 +636,316 @@
             <div class="garden-container-card">
                 <canvas id="garden-canvas"></canvas>
                 <div class="garden-controls-overlay">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="font-weight: 700; font-size: 13px;">Ambient Biosphere Engine</span>
-                        <button class="btn" style="padding: 4px 10px; font-size: 11px; background: var(--dash-blue-light); color: var(--dash-blue-accent);" onclick="toggleGardenMotion()">Pause Vector Field</button>
-                        <button class="btn" style="padding: 4px 10px; font-size: 11px; background: var(--dash-blue-light); color: var(--dash-blue-accent);" onclick="randomizeGardenGrowth()">Trigger Cross-Pollination</button>
+                    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <span style="font-weight: 800; font-size: 14px; color: var(--dash-blue-accent);">Interactive Magical Biosphere Engine</span>
+                        <button class="btn" style="padding: 6px 14px; font-size: 12px; font-weight:700; background: var(--dash-blue-light); color: var(--dash-blue-accent); border:none; border-radius:8px; cursor:pointer;" id="btn-toggle-motion" onclick="toggleGardenMotion()">Pause Simulation Vectors</button>
+                        <button class="btn" style="padding: 6px 14px; font-size: 12px; font-weight:700; background: var(--dash-blue-light); color: var(--dash-blue-accent); border:none; border-radius:8px; cursor:pointer;" onclick="randomizeGardenGrowth()">Trigger Cross-Pollination</button>
                     </div>
                     
                     <div class="music-dock">
-                        <span style="font-size: 11px; font-weight: 700; color: var(--dash-muted);">Soundscape Synth:</span>
-                        <button onclick="toggleAmbientSynthesizer()" id="synth-toggle-btn" class="btn" style="padding: 4px 12px; font-size: 11px; background: var(--dash-blue-deep); color: white;">Play Frequency</button>
-                        <button onclick="triggerGardenDancePulse()" class="btn" style="padding: 4px 10px; font-size: 11px; background: var(--success); color: white;">Pulse Biosphere</button>
+                        <span style="font-size: 12px; font-weight: 700; color: var(--dash-muted);">Peaceful Soundscape Synth:</span>
+                        <button onclick="toggleAmbientSynthesizer()" id="synth-toggle-btn" class="btn" style="padding: 6px 14px; font-size: 12px; font-weight:700; background: var(--dash-blue-accent); color: white; border:none; border-radius:8px; cursor:pointer;">Play Ambient Drone</button>
+                        <button onclick="triggerGardenDancePulse()" class="btn" style="padding: 6px 14px; font-size: 12px; font-weight:700; background: var(--dash-green); color: white; border:none; border-radius:8px; cursor:pointer;">Pulse Biosphere</button>
                     </div>
                 </div>
             </div>
 
             <section id="panel-analytics" class="dash-panel active-panel">
-                <div style="margin-bottom: 2rem;">
-                    <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.25rem;">Telemetry Control Node</h2>
-                    <p style="color: var(--dash-muted); font-size: 14px;">Welcome back, <span id="user-welcome-name" style="font-weight:700; color:var(--dash-blue-accent);">Operator</span>. System operational metrics are balanced.</p>
+                
+                <div class="luxury-card welcome-widget">
+                    <div>
+                        <h1 style="font-size: 2.2rem; font-weight: 800; margin: 0 0 0.5rem 0;">Mwamini Operations Center</h1>
+                        <p style="opacity: 0.9; font-size: 15px; margin: 0;">Welcome back, <span id="user-welcome-name" style="font-weight:800; text-decoration: underline;">Operator</span>. All localized routing vectors are currently balanced.</p>
+                        <div style="margin-top: 1rem; font-size: 13px; opacity: 0.8; font-family: monospace;" id="live-chrono-clock">System Epoch Synchronizing...</div>
+                    </div>
+                    <div class="user-avatar-wrapper">
+                        <img id="dashboard-avatar-preview" src="https://sdxtdkroyolagmjaipgw.supabase.co/storage/v1/object/public/product-assets/avatar-placeholder.png" alt="Profile Preview">
+                    </div>
                 </div>
 
                 <div class="metrics-grid">
                     <div class="metric-card">
-                        <div style="font-size: 12px; font-weight: 700; color: var(--dash-muted); text-transform: uppercase;">Active Freight Contracts</div>
-                        <div style="font-size: 2.2rem; font-weight: 800; margin: 0.5rem 0;" id="metric-orders-count">0</div>
-                        <div style="font-size: 12px; color: var(--dash-green); font-weight: 600;">↑ 100% Secure routing dispatch</div>
+                        <div style="font-size: 13px; font-weight: 700; color: var(--dash-muted); text-transform: uppercase; letter-spacing: 0.5px;">Active Freight Contracts</div>
+                        <div style="font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0;" id="metric-orders-count">0</div>
+                        <div style="font-size: 13px; color: var(--dash-green); font-weight: 700;">↑ Secure routing dispatch active</div>
                     </div>
                     <div class="metric-card">
-                        <div style="font-size: 12px; font-weight: 700; color: var(--dash-muted); text-transform: uppercase;">Platform Security clearance</div>
-                        <div style="font-size: 2.2rem; font-weight: 800; margin: 0.5rem 0; color: var(--dash-blue-deep);">Level 1</div>
-                        <div style="font-size: 12px; color: var(--dash-blue-accent); font-weight: 600;">AES-256 Bit Token Verified</div>
+                        <div style="font-size: 13px; font-weight: 700; color: var(--dash-muted); text-transform: uppercase; letter-spacing: 0.5px;">Security Clearance Identity</div>
+                        <div style="font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0; color: var(--dash-blue-accent);">Level 1 Verified</div>
+                        <div style="font-size: 13px; color: var(--dash-muted); font-weight: 600;">AES-256 Cloud Bit Encrypted</div>
                     </div>
-                    <div class="metric-card">
-                        <div style="font-size: 12px; font-weight: 700; color: var(--dash-muted); text-transform: uppercase;">Connected Hub Node</div>
-                        <div style="font-size: 1.4rem; font-weight: 700; margin: 0.8rem 0; overflow: hidden; text-overflow: ellipsis;" id="metric-hub-name">Unassigned</div>
-                        <div style="font-size: 12px; color: var(--dash-muted);" id="metric-user-phone">Retrieving data signal...</div>
+                    <div class="metric-card alert-metric">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--dash-red); text-transform: uppercase; letter-spacing: 0.5px;">Connected Delivery Hub</div>
+                        <div style="font-size: 1.6rem; font-weight: 800; margin: 0.6rem 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="metric-hub-name">Unassigned</div>
+                        <div style="font-size: 13px; color: var(--dash-muted);" id="metric-user-phone">Awaiting data signal...</div>
                     </div>
                 </div>
 
-                <div class="settings-card">
-                    <h3 style="margin-bottom: 1rem;">Primary Pipeline Dispatch Realtime Tracking</h3>
-                    <div id="active-pipeline-placeholder" style="color: var(--dash-muted); font-size: 14px; text-align: center; padding: 2rem 0;">
-                        Select an order from the tracking directory matrix to visualize telemetry trajectory.
+                <div class="dashboard-split-grid">
+                    <div>
+                        <div class="luxury-card" style="margin-bottom: 2rem;">
+                            <h3 style="margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 800;">Real-Time Pipeline Destination Telemetry Tracking</h3>
+                            <div id="active-pipeline-placeholder" style="color: var(--dash-muted); font-size: 14px; text-align: center; padding: 3rem 0;">
+                                Select an allocation record from the order directory layout matrix to render full spatial pipeline trajectories.
+                            </div>
+                            <div id="active-pipeline-display" style="display: none;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div><strong>Tracking Identity Token:</strong> <span id="pipeline-order-id" style="font-family: monospace; font-weight: 700; color: var(--dash-blue-accent);"></span></div>
+                                    <div><span id="pipeline-product-title" class="badge" style="background: var(--dash-blue-light); color: var(--dash-blue-accent); font-size: 13px; font-weight: 700; padding: 6px 14px; border-radius: 20px;"></span></div>
+                                </div>
+                                
+                                <div class="pipeline-tracker">
+                                    <div class="pipeline-progress-line" id="pipeline-indicator-line"></div>
+                                    <div class="pipeline-step" id="step-Pending">
+                                        <div class="pipeline-node">1</div>
+                                        <div class="pipeline-label">Pending</div>
+                                    </div>
+                                    <div class="pipeline-step" id="step-Processing">
+                                        <div class="pipeline-node">2</div>
+                                        <div class="pipeline-label">Processing</div>
+                                    </div>
+                                    <div class="pipeline-step" id="step-Delivered">
+                                        <div class="pipeline-node">3</div>
+                                        <div class="pipeline-label">Delivered</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="luxury-card">
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 800;">Cargo Metric Estimator Utility</h3>
+                            <p style="color: var(--dash-muted); font-size: 14px; margin-bottom: 1.5rem;">Calculate volumetric metrics and estimated pricing arrays instantly.</p>
+                            <div class="form-grid-two-col">
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display:block; font-size:12px; font-weight:700; margin-bottom:0.4rem;">Payload Weight (kg)</label>
+                                    <input type="number" id="calc-weight" value="1500" class="search-input" style="width:100%; box-sizing:border-box;" oninput="calculateBusinessMetrics()">
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display:block; font-size:12px; font-weight:700; margin-bottom:0.4rem;">Hub Transport Tier</label>
+                                    <select id="calc-tier" class="search-input" style="width:100%; box-sizing:border-box;" onchange="calculateBusinessMetrics()">
+                                        <option value="standard">Standard Global Node Maritime</option>
+                                        <option value="express">Express Priority Air Pipeline</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="background: var(--dash-blue-light); padding: 1.25rem; border-radius: 14px; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 700; font-size: 14px; color: var(--dash-blue-deep);">Estimated Premium Invoicing Cost:</span>
+                                <span style="font-size: 18px; font-weight: 800; color: var(--dash-blue-accent);" id="calc-output-cost">$4,500.00</span>
+                            </div>
+                        </div>
                     </div>
-                    <div id="active-pipeline-display" style="display: none;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <div><strong>Tracking ID:</strong> <span id="pipeline-order-id" style="font-family: monospace;"></span></div>
-                            <div><span id="pipeline-product-title" class="badge" style="background: var(--dash-blue-light); color: var(--dash-blue-accent); font-size: 12px; padding: 6px 12px;"></span></div>
-                        </div>
-                        
-                        <div class="pipeline-tracker">
-                            <div class="pipeline-progress-line" id="pipeline-indicator-line"></div>
-                            <div class="pipeline-step" id="step-Pending">
-                                <div class="pipeline-node">1</div>
-                                <div class="pipeline-label">Pending</div>
-                            </div>
-                            <div class="pipeline-step" id="step-Processing">
-                                <div class="pipeline-node">2</div>
-                                <div class="pipeline-label">Processing</div>
-                            </div>
-                            <div class="pipeline-step" id="step-Delivered">
-                                <div class="pipeline-node">3</div>
-                                <div class="pipeline-label">Delivered</div>
+
+                    <div>
+                        <div class="luxury-card" style="margin-bottom: 2rem;">
+                            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--dash-red);">Notification Center Matrix</h3>
+                            <div class="notification-tray">
+                                <div class="notification-item">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    <div><strong>Mandatory Node Sync:</strong> Please verify your cellular communication endpoint link within account parameters immediately to receive freight manifest updates.</div>
+                                </div>
+                                <div class="notification-item" style="background: rgba(37,99,235,0.06); border-left-color: var(--dash-blue-accent); color: var(--dash-text); animation: none;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color:var(--dash-blue-accent); flex-shrink:0; margin-top:2px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                    <div><strong>Gateway Encryption:</strong> AES-256 bit secure tunnels operating at top performance bounds.</div>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="luxury-card" style="margin-bottom: 2rem;">
+                            <h3 style="margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 800;">User Node Activity Timeline</h3>
+                            <div class="activity-timeline">
+                                <div class="timeline-event">
+                                    <strong style="font-size:13px; display:block;">Session Core Instantiated</strong>
+                                    <small style="color: var(--dash-muted);">Telemetry data channel established cleanly.</small>
+                                </div>
+                                <div class="timeline-event">
+                                    <strong style="font-size:13px; display:block;">Profile Mapping Pulled</strong>
+                                    <small style="color: var(--dash-muted);">Metadata synchronized with public user ledger ledger.</small>
+                                </div>
+                                <div class="timeline-event crit-event">
+                                    <strong style="font-size:13px; display:block; color: var(--dash-red);">Real-time Telemetry Standby</strong>
+                                    <small style="color: var(--dash-muted);">Listening for external Postgres distribution updates.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="luxury-card">
+                            <h3 style="margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 800;">Frequently Monitored Hub Nodes</h3>
+                            <div style="display:flex; flex-direction:column; gap: 0.75rem;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0; border-bottom: 1px solid var(--dash-border);">
+                                    <span style="font-size:13px; font-weight:700;">⚓ Port of Mombasa Inbound</span>
+                                    <span class="badge" style="background:var(--dash-green); color:white; font-size:11px; padding:3px 8px; border-radius:10px;">Operational</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0; border-bottom: 1px solid var(--dash-border);">
+                                    <span style="font-size:13px; font-weight:700;">✈️ Kigali Transit Terminal Alpha</span>
+                                    <span class="badge" style="background:var(--dash-green); color:white; font-size:11px; padding:3px 8px; border-radius:10px;">Operational</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0;">
+                                    <span style="font-size:13px; font-weight:700;">🚛 Dar es Salaam Corridor Gate</span>
+                                    <span class="badge" style="background:var(--dash-blue-accent); color:white; font-size:11px; padding:3px 8px; border-radius:10px;">Heavy Load</span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </section>
 
             <section id="panel-orders" class="dash-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-                    <div>
-                        <h2 style="font-size: 1.6rem; font-weight: 800;">Freight Order Allocation Directory</h2>
-                        <p style="color: var(--dash-muted); font-size: 14px;">Audit and filter real-time container consignments.</p>
+                <div class="luxury-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1.5rem;">
+                        <div>
+                            <h2 style="font-size: 1.8rem; font-weight: 800; margin: 0 0 0.4rem 0;">Freight Order Allocation Directory</h2>
+                            <p style="color: var(--dash-muted); font-size: 14px; margin: 0;">Audit and filter global container routing pipelines dynamically.</p>
+                        </div>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <input type="text" id="order-search-input" class="search-input" style="padding: 0.6rem 1.25rem;" placeholder="Search allocation name..." oninput="filterOrdersLog()">
+                            <select id="order-status-filter" class="search-input" onchange="filterOrdersLog()">
+                                <option value="All">All Status Tiers</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 0.75rem;">
-                        <input type="text" id="order-search-input" class="search-input" style="padding: 0.5rem 1rem; font-size: 13px;" placeholder="Search allocation name..." oninput="filterOrdersLog()">
-                        <select id="order-status-filter" class="filter-select" style="padding: 0.5rem 1rem; font-size: 13px;" onchange="filterOrdersLog()">
-                            <option value="All">All Pipelines</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Delivered">Delivered</option>
-                        </select>
-                    </div>
-                </div>
 
-                <div style="background: var(--dash-bg-card); border-radius: 16px; border: 1px solid var(--dash-border); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-                    <table class="dashboard-table" style="box-shadow: none; border-radius: 0;">
-                        <thead>
-                            <tr>
-                                <th>Allocation Reference Token</th>
-                                <th>Commodity payload</th>
-                                <th>Metrics</th>
-                                <th>Hub Destination</th>
-                                <th>Telemetry Pipeline Status</th>
-                                <th>Action Terminal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dashboard-orders-table-body">
-                            <tr><td colspan="6" style="text-align: center; color: var(--dash-muted); padding: 3rem;">Synchronizing with core data signal payload...</td></tr>
-                        </tbody>
-                    </table>
+                    <div style="border-radius: 16px; border: 1px solid var(--dash-border); overflow: hidden; background: var(--dash-bg-card);">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Allocation Reference Token</th>
+                                    <th>Commodity Payload</th>
+                                    <th>Metrics</th>
+                                    <th>Hub Destination</th>
+                                    <th>Telemetry Pipeline Status</th>
+                                    <th style="text-align:right;">Action Terminal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-orders-table-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--dash-muted); padding: 4rem;">Awaiting verification matrix handshake network initialization...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <section id="panel-social" class="dash-panel">
-                <div style="margin-bottom: 2rem;">
-                    <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.25rem;">Inter-Enterprise Chat Node</h2>
-                    <p style="color: var(--dash-muted); font-size: 14px;">Review updates and react to logs within the secured ecosystem group framework.</p>
-                </div>
-
                 <div class="dashboard-split-grid">
-                    <div class="settings-card">
-                        <h3 style="margin-bottom: 1.5rem;">Transmission Stream</h3>
-                        <div class="comment-stream" id="dashboard-comments-container">
+                    <div class="luxury-card">
+                        <h2 style="font-size: 1.6rem; font-weight: 800; margin: 0 0 0.5rem 0;">Ecosystem Feedback Node</h2>
+                        <p style="color: var(--dash-muted); font-size: 14px; margin-bottom: 2rem;">Broadcast localized telemetry data changes and logs directly to the public feed matrix.</p>
+                        
+                        <div class="comment-stream" id="dashboard-comments-container"></div>
+
+                        <form id="dashboard-comment-form" onsubmit="submitSocialCommentNode(event)" style="border-top: 1px solid var(--dash-border); padding-top: 1.5rem;">
+                            <div style="margin-bottom: 1.25rem;">
+                                <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 0.5rem;">Write Broadcast Payload Message</label>
+                                <textarea id="comment-body-input" class="search-input" style="width: 100%; min-height: 90px; font-family: inherit; box-sizing: border-box; resize: vertical;" placeholder="Type message parameters here... (Empty strings rejected)" required></textarea>
                             </div>
+                            <button type="submit" class="btn" style="background: var(--dash-blue-accent); color: white; border: none; padding: 0.8rem 1.8rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s;">Transmit Broadcast Token</button>
+                        </form>
                     </div>
 
-                    <div class="settings-card">
-                        <h3 style="margin-bottom: 1rem;">Transmit New Dispatch Payload</h3>
-                        <form id="dash-comment-submit-form" onsubmit="submitDashComment(event)">
-                            <div style="margin-bottom: 1rem;">
-                                <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 0.5rem;">Corporate Signature Alias</label>
-                                <input type="text" id="dash-comment-author" class="search-input" style="width: 100%; font-size: 14px;" required placeholder="e.g. Lead Logistics Officer">
+                    <div>
+                        <div class="luxury-card">
+                            <h3 style="margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 800;">Quick Matrix Actions</h3>
+                            <div class="quick-actions-grid">
+                                <div class="action-card-btn" onclick="pullFreightOrdersPayload()">🔄 Sync Telemetry</div>
+                                <div class="action-card-btn" onclick="randomizeGardenGrowth()">🌱 Cross Pollinate</div>
+                                <div class="action-card-btn" onclick="triggerGardenDancePulse()">⚡ Biosphere Pulse</div>
+                                <div class="action-card-btn" onclick="showDashToast('Downloaded complete data manifest payload token.')">💾 Get Manifest</div>
                             </div>
-                            <div style="margin-bottom: 1.5rem;">
-                                <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 0.5rem;">Verbatim Payload</label>
-                                <textarea id="dash-comment-body" class="search-input" style="width: 100%; height: 110px; font-size: 14px; resize: none;" required placeholder="Type system-wide message broadcast payload..."></textarea>
+                        </div>
+
+                        <div class="luxury-card">
+                            <h3 style="margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 800;">Interactive Dashboard Widgets</h3>
+                            <div style="padding: 1rem; border-radius: 14px; background: var(--dash-blue-light); margin-bottom: 1rem;">
+                                <div style="font-size:12px; font-weight:700; color:var(--dash-muted); text-transform:uppercase;">Next Container Delivery Eta</div>
+                                <div style="font-size: 20px; font-weight: 800; color: var(--dash-blue-deep); margin-top: 4px;" id="widget-countdown">04h : 22m : 11s</div>
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem;">Inject Payload into Data Field</button>
-                        </form>
+                            <div style="padding: 1rem; border-radius: 14px; background: var(--dash-blue-light);">
+                                <div style="font-size:12px; font-weight:700; color:var(--dash-muted); text-transform:uppercase;">Target Hub Atmospheric Weather</div>
+                                <div style="font-size: 15px; font-weight: 700; color: var(--dash-blue-deep); margin-top: 4px;">Kigali Terminal: Clear Sky / 24°C</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section id="panel-settings" class="dash-panel">
-                <div style="margin-bottom: 2rem;">
-                    <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.25rem;">Account Parameter Configuration Matrix</h2>
-                    <p style="color: var(--dash-muted); font-size: 14px;">Modify identities, authorization structures, and system communication triggers.</p>
-                </div>
-
                 <div class="dashboard-split-grid">
-                    <div>
-                        <div class="settings-card">
-                            <h3 style="margin-bottom: 1.5rem; color: var(--dash-blue-deep);">Profile Identity Settings</h3>
-                            <form id="dash-profile-settings-form" onsubmit="saveProfileMatrix(event)">
-                                <div style="text-align: center; margin-bottom: 1.5rem;">
-                                    <img id="dash-settings-avatar-preview" class="user-avatar-preview" src="https://via.placeholder.com/80" alt="Avatar">
-                                    <div style="font-size: 12px; color: var(--dash-muted); margin-top: 4px;">Dynamic verification identity photo</div>
+                    <div class="luxury-card">
+                        <h2 style="font-size: 1.6rem; font-weight: 800; margin: 0 0 0.5rem 0;">Identity Variable Configuration Ledger</h2>
+                        <p style="color: var(--dash-muted); font-size: 14px; margin-bottom: 2rem;">Modify authenticated operational variables safely written into security schema layers.</p>
+                        
+                        <form id="dashboard-profile-form" onsubmit="updateProfileIdentity(event)">
+                            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 2rem; background: var(--dash-blue-light); padding: 1.25rem; border-radius: 16px;">
+                                <div class="user-avatar-wrapper" style="width: 70px; height: 70px; flex-shrink: 0;">
+                                    <img id="form-avatar-preview" src="https://sdxtdkroyolagmjaipgw.supabase.co/storage/v1/object/public/product-assets/avatar-placeholder.png" alt="Avatar">
                                 </div>
-                                <div class="form-grid-two-col">
-                                    <div style="margin-bottom: 1rem;">
-                                        <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.25rem;">Full Legal Name</label>
-                                        <input type="text" id="set-full-name" class="search-input" style="width: 100%;" required>
-                                    </div>
-                                    <div style="margin-bottom: 1rem;">
-                                        <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.25rem;">Secure Phone Line</label>
-                                        <input type="text" id="set-phone-number" class="search-input" style="width: 100%;" required>
-                                    </div>
+                                <div style="flex: 1;">
+                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.4rem;">Identity Avatar Image URL</label>
+                                    <input type="url" id="set-avatar-url" class="search-input" style="width: 100%; box-sizing: border-box;" placeholder="https://example.com/photo.jpg" oninput="document.getElementById('form-avatar-preview').src=this.value || 'https://sdxtdkroyolagmjaipgw.supabase.co/storage/v1/object/public/product-assets/avatar-placeholder.png'">
                                 </div>
-                                <div class="form-grid-two-col">
-                                    <div style="margin-bottom: 1rem;">
-                                        <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.25rem;">Operational Location Base</label>
-                                        <input type="text" id="set-location" class="search-input" style="width: 100%;">
-                                    </div>
-                                    <div style="margin-bottom: 1rem;">
-                                        <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.25rem;">Destination Freight Hub</label>
-                                        <input type="text" id="set-dest-hub" class="search-input" style="width: 100%;">
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.75rem;">Commit Identity Modifications</button>
-                            </form>
-                        </div>
-
-                        <div class="settings-card">
-                            <h3 style="margin-bottom: 1.5rem; color: var(--dash-blue-deep);">Cryptographic Access Terminal</h3>
-                            <div style="margin-bottom: 1.25rem;">
-                                <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.25rem;">Rotate Passphrase Key Token</label>
-                                <input type="password" id="set-new-password" class="search-input" style="width: 100%;" placeholder="Enter updated alpha-numeric hash key">
                             </div>
-                            <button type="button" onclick="rotateSecurityToken()" class="btn" style="width: 100%; background: var(--dash-blue-light); color: var(--dash-blue-accent); font-weight: 700;">Re-Authorize Security Key</button>
-                        </div>
+
+                            <div class="form-grid-two-col">
+                                <div style="margin-bottom: 1.25rem;">
+                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.5rem;">Full Legal Name</label>
+                                    <input type="text" id="set-full-name" class="search-input" style="width: 100%; box-sizing: border-box;" required>
+                                </div>
+                                <div style="margin-bottom: 1.25rem;">
+                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.5rem;">Secure Cellular Communication Line</label>
+                                    <input type="text" id="set-phone-number" class="search-input" style="width: 100%; box-sizing: border-box;" required>
+                                </div>
+                            </div>
+                            <div class="form-grid-two-col">
+                                <div style="margin-bottom: 1.25rem;">
+                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.5rem;">Operational Location Base</label>
+                                    <input type="text" id="set-location" class="search-input" style="width: 100%; box-sizing: border-box;">
+                                </div>
+                                <div style="margin-bottom: 1.25rem;">
+                                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.5rem;">Destination Freight Hub</label>
+                                    <input type="text" id="set-dest-hub" class="search-input" style="width: 100%; box-sizing: border-box;">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn" style="background: var(--dash-blue-accent); color: white; border: none; width: 100%; padding: 1rem; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 1rem;">Commit Identity Modifications</button>
+                        </form>
                     </div>
 
                     <div>
-                        <div class="settings-card">
-                            <h3 style="margin-bottom: 1rem; color: var(--dash-blue-deep);">Notification Trigger Preferences</h3>
-                            <p style="color: var(--dash-muted); font-size: 13px; margin-bottom: 1rem;">Configure pipeline alert automation dispatches.</p>
-                            
-                            <div class="toggle-row">
-                                <div>
-                                    <div style="font-weight:600; font-size:14px;">Instant SMS Telemetry Triggers</div>
-                                    <div style="font-size:12px; color:var(--dash-muted);">Transmit raw status logs directly to cellular terminal</div>
-                                </div>
-                                <label class="switch-toggle">
-                                    <input type="checkbox" checked id="pref-sms-toggle">
-                                    <span class="slider-round"></span>
-                                </label>
+                        <div class="luxury-card" style="margin-bottom: 2rem;">
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 800; color: var(--dash-blue-deep);">Cryptographic Access Terminal</h3>
+                            <p style="color: var(--dash-muted); font-size: 13px; margin-bottom: 1.5rem;">Rotate password mapping parameters instantly.</p>
+                            <div style="margin-bottom: 1.25rem;">
+                                <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 0.5rem;">New Cryptographic Passphrase</label>
+                                <input type="password" id="set-new-password" class="search-input" style="width: 100%; box-sizing: border-box;" placeholder="Minimum 6 complex tokens...">
                             </div>
-                            <div class="toggle-row">
-                                <div>
-                                    <div style="font-weight:600; font-size:14px;">Encrypted Email Manifesto Dispatches</div>
-                                    <div style="font-size:12px; color:var(--dash-muted);">Receive complete container manifestos on stage transition</div>
-                                </div>
-                                <label class="switch-toggle">
-                                    <input type="checkbox" checked id="pref-email-toggle">
-                                    <span class="slider-round"></span>
-                                </label>
-                            </div>
-                            <div class="toggle-row">
-                                <div>
-                                    <div style="font-weight:600; font-size:14px;">Real-Time Server Pipeline Telemetry Signals</div>
-                                    <div style="font-size:12px; color:var(--dash-muted);">Stream persistent connection packets for tracking animations</div>
-                                </div>
-                                <label class="switch-toggle">
-                                    <input type="checkbox" checked id="pref-realtime-toggle">
-                                    <span class="slider-round"></span>
-                                </label>
-                            </div>
+                            <button onclick="rotateSecurityToken()" class="btn" style="background: var(--dash-blue-deep); color: white; border: none; width: 100%; padding: 0.8rem; border-radius: 12px; font-weight: 700; cursor: pointer;">Execute Security Rotation</button>
                         </div>
 
-                        <div class="settings-card">
-                            <h3 style="margin-bottom: 1rem; color: var(--dash-blue-deep);">Connected Enterprise Pipeline Tools</h3>
+                        <div class="luxury-card">
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 800;">Ecosystem Configuration Variables</h3>
                             <div class="toggle-row">
                                 <div>
-                                    <div style="font-weight:600; font-size:14px;">Supabase Global Data Grid Replication</div>
-                                    <div style="font-size:12px; color:var(--dash-green); font-weight:700;">LINKED & SYNCHRONIZED</div>
+                                    <strong style="font-size: 14px; display: block;">Real-Time Pipeline Listeners</strong>
+                                    <small style="color: var(--dash-muted); font-size: 12px;">Listen for Postgres change broadcasts instantly.</small>
                                 </div>
-                                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--dash-green);"></div>
+                                <label class="switch-toggle">
+                                    <input type="checkbox" id="toggle-realtime-sync" checked onchange="handleRealtimeToggleState(this)">
+                                    <span class="slider-round"></span>
+                                </label>
                             </div>
-                            <div class="toggle-row">
+                            <div class="toggle-row" style="border: none;">
                                 <div>
-                                    <div style="font-weight:600; font-size:14px;">ISO-9001 Transit Manifest Verification Grid</div>
-                                    <div style="font-size:12px; color:var(--dash-blue-accent); font-weight:700;">OPERATIONAL STANDBY</div>
+                                    <strong style="font-size: 14px; display: block;">High-Performance Biosphere</strong>
+                                    <small style="color: var(--dash-muted); font-size: 12px;">Optimize vectors for maximum background frame rates.</small>
                                 </div>
-                                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--dash-blue-accent);"></div>
+                                <label class="switch-toggle">
+                                    <input type="checkbox" id="toggle-high-perf" checked>
+                                    <span class="slider-round"></span>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -643,15 +955,15 @@
         </main>
     </div>
 
-    <div id="dash-toast-system" class="toast-notification">Payload operational alert event registered.</div>
+    <div id="dash-toast-system" style="position: fixed; bottom: 30px; right: 30px; background: var(--dash-blue-deep); color: white; padding: 1.25rem 2rem; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border-left: 6px solid var(--dash-blue-accent); z-index: 1000; font-weight: 600; font-size: 14px; transform: translateY(150px); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: block;">Initial connection ready.</div>
 
     <script>
-        // System variables & cache mappings
+        // --- GLOBAL VARIABLES & CACHE STATE MAPPINGS ---
         let currentSessionUser = null;
         let globalOrdersCache = [];
         let globalCommentsMock = [
-            { id: 1, author: "System Terminal Alpha", body: "Ecosystem synchronized. Ready for secure freight manifest operations.", reactions: { "👍": 4, "🚀": 2 } },
-            { id: 2, author: "Kigali Logistics Hub", body: "Container batch #94-G grains transit pipeline verified at port boundary.", reactions: { "❤️": 5, "🎉": 3 } }
+            { id: 1, author: "System Terminal Alpha", body: "Ecosystem synchronized. Ready for secure freight manifest operations.", reactions: { "👍": 6, "🚀": 4, "❤️": 2, "🎉": 1, "🔥": 3 } },
+            { id: 2, author: "Kigali Logistics Hub", body: "Container batch #94-G grains transit pipeline verified at port boundary.", reactions: { "👍": 2, "🚀": 1, "❤️": 8, "🎉: 5, "🔥": 2 } }
         ];
 
         // Canvas animation settings variables
@@ -662,7 +974,10 @@
         let grassBlades = [];
         let butterflies = [];
         let ambientParticles = [];
+        let birds = [];
+        let leaves = [];
         let cloudOffset = 0;
+        let globalTime = 0;
 
         // Audio System State Mappings (Web Audio API Synthesizer)
         let audioCtx = null;
@@ -670,15 +985,18 @@
         let ambientOscillator = null;
         let ambientGainNode = null;
         let oscillatorIntervalId = null;
+        let realtimeChannelInstance = null;
 
         document.addEventListener("DOMContentLoaded", async () => {
             initializeThemeRouting();
             setupInteractiveGardenCanvas();
             renderSocialCommentStream();
+            initializeCountdownWidget();
             
             // Connect to live Supabase client instance exposed via global configuration scope
             if (window.supabase) {
                 await synchronizeUserSessionState();
+                initializeRealtimeTelemetrySync();
             } else {
                 showDashToast("Warning: Core database system instance signal detached.", true);
             }
@@ -693,6 +1011,15 @@
                     root.setAttribute('data-theme', nextTheme);
                 });
             }
+            
+            // Live clock utility initialization
+            setInterval(() => {
+                const clock = document.getElementById("live-chrono-clock");
+                if(clock) {
+                    const now = new Date();
+                    clock.innerText = "CHRONO TOKEN: " + now.toISOString().replace("T", " ").substring(0, 19) + " UTC";
+                }
+            }, 1000);
         }
 
         async function synchronizeUserSessionState() {
@@ -704,7 +1031,7 @@
                     return;
                 }
                 currentSessionUser = session.user;
-                
+
                 // Query core Profile configuration schema matrix
                 const { data: profile, error: profErr } = await window.supabase
                     .from('profiles')
@@ -718,32 +1045,30 @@
                     document.getElementById('metric-user-phone').innerText = profile.phone_number || "No direct cellular signal Link";
                     
                     // Bind elements inside profile setup block
-                    document.getElementById('set-full-name').value = profile.full_name || '';
-                    document.getElementById('set-phone-number').value = profile.phone_number || '';
-                    document.getElementById('set-location').value = profile.location || '';
-                    document.getElementById('set-dest-hub').value = profile.destination_hub || '';
-                    if (profile.avatar_url) {
-                        document.getElementById('dash-settings-avatar-preview').src = profile.avatar_url;
+                    if(document.getElementById('set-full-name')) document.getElementById('set-full-name').value = profile.full_name || '';
+                    if(document.getElementById('set-phone-number')) document.getElementById('set-phone-number').value = profile.phone_number || '';
+                    if(document.getElementById('set-location')) document.getElementById('set-location').value = profile.location || '';
+                    if(document.getElementById('set-dest-hub')) document.getElementById('set-dest-hub').value = profile.destination_hub || '';
+                    if(profile.avatar_url) {
+                        document.getElementById('dashboard-avatar-preview').src = profile.avatar_url;
+                        document.getElementById('form-avatar-preview').src = profile.avatar_url;
+                        document.getElementById('set-avatar-url').value = profile.avatar_url;
                     }
-                } else {
-                    document.getElementById('user-welcome-name').innerText = currentSessionUser.email;
                 }
 
                 await pullFreightOrdersPayload();
-                initializeRealtimeTelemetrySync();
-
+                await syncDatabaseCommentsLayer();
             } catch (err) {
-                console.error("Critical tracking session fault:", err);
+                showDashToast("Critical structural session synchronization collapse: " + err.message, true);
             }
         }
 
         async function pullFreightOrdersPayload() {
             if(!window.supabase || !currentSessionUser) return;
             
-            // Attempt extraction based on phone mapping configuration matches matching index.html logic
             let searchPhone = document.getElementById('set-phone-number')?.value || '';
-            
             let query = window.supabase.from('orders').select('*');
+            
             if(searchPhone) {
                 query = query.or(`phone_number.eq.${searchPhone},customer_phone.eq.${searchPhone}`);
             } else if(currentSessionUser.email) {
@@ -751,7 +1076,6 @@
             }
             
             const { data, error } = await query.order('created_at', { ascending: false });
-            
             if (!error && data) {
                 globalOrdersCache = data;
                 document.getElementById('metric-orders-count').innerText = data.length;
@@ -769,24 +1093,25 @@
             if(!tbody) return;
             
             if(ordersList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--dash-muted); padding: 3rem;">No active freight records mapped to this data signal network.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--dash-muted); padding: 4rem; font-weight:600;">No active freight records mapped to this data signal network.</td></tr>`;
                 return;
             }
-
+            
             tbody.innerHTML = '';
             ordersList.forEach(order => {
                 const tr = document.createElement('tr');
                 let statusColor = "var(--dash-blue-accent)";
                 if (order.status === 'Delivered') statusColor = "var(--dash-green)";
                 if (order.status === 'Pending') statusColor = "var(--dash-muted)";
-
+                if (order.status === 'Processing') statusColor = "var(--dash-blue-glow)";
+                
                 tr.innerHTML = `
-                    <td style="font-family: monospace; font-weight:700;">${order.id.substring(0,8)}...</td>
+                    <td style="font-family: monospace; font-weight:700; color:var(--dash-blue-accent);">${order.id.substring(0,8)}...</td>
                     <td><strong>${order.product_title || 'Commodity Material Pack'}</strong></td>
-                    <td>Qty: ${order.quantity || 1}</td>
-                    <td><small>${order.location || 'Central Depot Hub'}</small></td>
-                    <td><span class="badge" style="background: var(--dash-blue-light); color: ${statusColor};">${order.status || 'Pending'}</span></td>
-                    <td><button class="btn" style="padding:4px 12px; font-size:11px; background: var(--dash-blue-deep); color:white;" onclick="selectOrderToVisualize('${order.id}')">Map Telemetry</button></td>
+                    <td>Qty: <span style="font-weight:700;">${order.quantity || 1}</span></td>
+                    <td><small style="font-weight:600; color:var(--dash-muted);">${order.location || 'Central Depot Hub'}</small></td>
+                    <td><span class="badge" style="background: var(--dash-blue-light); color: ${statusColor}; font-weight:800; padding:4px 10px; border-radius:12px;">${order.status || 'Pending'}</span></td>
+                    <td style="text-align:right;"><button class="btn" style="padding:6px 14px; font-size:12px; font-weight:700; background: var(--dash-blue-deep); color:white; border:none; border-radius:8px; cursor:pointer;" onclick="selectOrderToVisualize('${order.id}')">Map Telemetry</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -797,85 +1122,71 @@
             if(match) {
                 activatePipelineVisualizer(match);
                 switchPanel('analytics');
-                showDashToast(`Visualizing layout pipeline map tracking for token: ${orderId.substring(0,8)}`);
+                showDashToast(`Visualizing layout pipeline map tracking for token: ${orderId.substring(0,8)}...`);
             }
         }
 
         function activatePipelineVisualizer(order) {
-            document.getElementById('active-pipeline-placeholder').style.display = 'none';
-            document.getElementById('active-pipeline-display').style.display = 'block';
+            const display = document.getElementById('active-pipeline-display');
+            const placeholder = document.getElementById('active-pipeline-placeholder');
+            
+            if(!display || !placeholder) return;
+            placeholder.style.display = 'none';
+            display.style.display = 'block';
+            
             document.getElementById('pipeline-order-id').innerText = order.id;
-            document.getElementById('pipeline-product-title').innerText = order.product_title || 'Material Cargo';
-
-            // Reset step class allocations
-            ['Pending', 'Processing', 'Delivered'].forEach(st => {
-                document.getElementById(`step-${st}`).classList.remove('completed', 'active');
+            document.getElementById('pipeline-product-title').innerText = order.product_title || 'General Cargo Pack';
+            
+            const steps = ['Pending', 'Processing', 'Delivered'];
+            const currentStatus = order.status || 'Pending';
+            const activeIdx = steps.indexOf(currentStatus);
+            
+            steps.forEach((step, idx) => {
+                const stepEl = document.getElementById(`step-${step}`);
+                if(stepEl) {
+                    stepEl.classList.remove('active', 'completed');
+                    if(idx < activeIdx) stepEl.classList.add('completed');
+                    if(idx === activeIdx) stepEl.classList.add('active');
+                }
             });
-
-            // Map and color appropriate steps along pipeline
-            if (order.status === 'Pending') {
-                document.getElementById('step-Pending').classList.add('active');
-                document.getElementById('pipeline-indicator-line').style.width = '0%';
-            } else if (order.status === 'Processing') {
-                document.getElementById('step-Pending').classList.add('completed');
-                document.getElementById('step-Processing').classList.add('active');
-                document.getElementById('pipeline-indicator-line').style.width = '50%';
-            } else if (order.status === 'Delivered') {
-                document.getElementById('step-Pending').classList.add('completed');
-                document.getElementById('step-Processing').classList.add('completed');
-                document.getElementById('step-Delivered').classList.add('completed');
-                document.getElementById('pipeline-indicator-line').style.width = '100%';
-            } else {
-                // Fallback tracking mapping defaults
-                document.getElementById('step-Pending').classList.add('active');
-                document.getElementById('pipeline-indicator-line').style.width = '0%';
+            
+            const line = document.getElementById('pipeline-indicator-line');
+            if(line) {
+                let widthPercent = 0;
+                if(activeIdx === 1) widthPercent = 50;
+                if(activeIdx === 2) widthPercent = 100;
+                line.style.width = `${widthPercent}%`;
             }
         }
 
-        function filterOrdersLog() {
-            const sVal = document.getElementById('order-search-input').value.toLowerCase();
-            const statusFilter = document.getElementById('order-status-filter').value;
-            
-            const filtered = globalOrdersCache.filter(o => {
-                const matchesSearch = (o.product_title || '').toLowerCase().includes(sVal) || o.id.toLowerCase().includes(sVal);
-                const matchesStatus = statusFilter === 'All' || o.status === statusFilter;
-                return matchesSearch && matchesStatus;
-            });
-            renderOrdersTableGrid(filtered);
-        }
-
-        function switchPanel(panelId) {
-            document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active-panel'));
-            document.querySelectorAll('.dash-nav-btn').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(`panel-${panelId}`).classList.add('active-panel');
-            event.currentTarget.classList.add('active');
-        }
-
-        // --- ACCOUNT SETTINGS SUBMISSION ENGINE ---
-        async function saveProfileMatrix(e) {
+        async function updateProfileIdentity(e) {
             e.preventDefault();
-            if(!window.supabase || !currentSessionUser) return;
-
+            if(!currentSessionUser || !window.supabase) return;
+            
             const updatedPayload = {
                 full_name: document.getElementById('set-full-name').value.trim(),
                 phone_number: document.getElementById('set-phone-number').value.trim(),
                 location: document.getElementById('set-location').value.trim(),
                 destination_hub: document.getElementById('set-dest-hub').value.trim(),
+                avatar_url: document.getElementById('set-avatar-url').value.trim(),
                 updated_at: new Date()
             };
-
+            
             const { error } = await window.supabase
                 .from('profiles')
                 .update(updatedPayload)
                 .eq('id', currentSessionUser.id);
-
+                
             if(!error) {
                 showDashToast("Identity variables successfully written into secure schema cloud ledger.");
                 document.getElementById('user-welcome-name').innerText = updatedPayload.full_name;
                 document.getElementById('metric-hub-name').innerText = updatedPayload.destination_hub || "Global Route Node";
                 document.getElementById('metric-user-phone').innerText = updatedPayload.phone_number;
-                await pullFreightOrdersPayload(); // Recalculate based on newly registered phone number lines
+                if(updatedPayload.avatar_url) {
+                    document.getElementById('dashboard-avatar-preview').src = updatedPayload.avatar_url;
+                    document.getElementById('form-avatar-preview').src = updatedPayload.avatar_url;
+                }
+                await pullFreightOrdersPayload();
             } else {
                 showDashToast("Database mutation rejected: " + error.message, true);
             }
@@ -887,6 +1198,7 @@
                 showDashToast("Error: Passphrase must be at least 6 characters.", true);
                 return;
             }
+            
             const { error } = await window.supabase.auth.updateUser({ password: pass });
             if(!error) {
                 showDashToast("Cryptographic access token successfully updated.");
@@ -896,366 +1208,533 @@
             }
         }
 
-        // --- SOCIAL ENGAGEMENT ARCHITECTURE ---
+        // --- PRODUCTION SOCIAL INTERACTION ENGINE LAYER ---
+        async function syncDatabaseCommentsLayer() {
+            if (!window.supabase) return;
+            const { data, error } = await window.supabase
+                .from('dashboard_comments')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (!error && data && data.length > 0) {
+                globalCommentsMock = data;
+            }
+            renderSocialCommentStream();
+        }
+
         function renderSocialCommentStream() {
             const container = document.getElementById('dashboard-comments-container');
             if(!container) return;
             container.innerHTML = '';
             
-            globalCommentsMock.forEach(comment => {
+            globalCommentsMock.forEach((comment, idx) => {
                 const node = document.createElement('div');
                 node.className = 'comment-node';
+                
+                let rxRow = '';
+                const rxMap = comment.reactions || { "👍": 0, "🚀": 0, "❤️": 0, "🎉": 0, "🔥": 0 };
+                for (let key in rxMap) {
+                    rxRow += `<div class="react-pill" onclick="registerReaction(${comment.id || idx}, '${key}')">${key} <span>${rxMap[key]}</span></div>`;
+                }
+
                 node.innerHTML = `
-                    <div style="font-size:13px; font-weight:700; color:var(--dash-blue-deep); margin-bottom:4px;">${comment.author}</div>
-                    <div style="font-size:13px; opacity:0.9; line-height:1.4;">${comment.body}</div>
-                    <div class="reaction-row">
-                        <button class="react-pill" onclick="triggerNodeReaction(${comment.id}, '👍')">👍 <span>${comment.reactions['👍'] || 0}</span></button>
-                        <button class="react-pill" onclick="triggerNodeReaction(${comment.id}, '🚀')">🚀 <span>${comment.reactions['🚀'] || 0}</span></button>
-                        <button class="react-pill" onclick="triggerNodeReaction(${comment.id}, '❤️')">❤️ <span>${comment.reactions['❤️'] || 0}</span></button>
-                    </div>
+                    <div style="font-size:14px; font-weight:800; color:var(--dash-blue-accent); margin-bottom:6px;">${comment.author || 'Anonymous'}</div>
+                    <div style="font-size:14px; color:var(--dash-text); line-height:1.5; word-break:break-all;">${comment.body}</div>
+                    <div class="reaction-row">${rxRow}</div>
                 `;
                 container.appendChild(node);
             });
         }
 
-        function submitDashComment(e) {
+        async function submitSocialCommentNode(e) {
             e.preventDefault();
-            const authorInput = document.getElementById('dash-comment-author');
-            const bodyInput = document.getElementById('dash-comment-body');
-            
+            const field = document.getElementById("comment-body-input");
+            if (!field || !field.value.trim()) return;
+
+            const bodyStr = field.value.trim();
+            const authorName = currentSessionUser ? (document.getElementById('set-full-name')?.value || currentSessionUser.email) : "Guest Operator";
+
             const newComment = {
-                id: globalCommentsMock.length + 1,
-                author: authorInput.value.trim(),
-                body: bodyInput.value.trim(),
-                reactions: { "👍": 1 }
+                author: authorName,
+                body: bodyStr,
+                reactions: { "👍": 0, "🚀": 0, "❤️": 0, "🎉": 0, "🔥": 0 }
             };
-            
-            globalCommentsMock.unshift(newComment);
-            renderSocialCommentStream();
-            bodyInput.value = '';
-            showDashToast("Social package injected successfully.");
+
+            if (window.supabase && currentSessionUser) {
+                newComment.user_id = currentSessionUser.id;
+                const { error } = await window.supabase.from('dashboard_comments').insert(newComment);
+                if (error) {
+                    showDashToast("Could not push live comment to table, standard loop execution fallback used.", true);
+                }
+                await syncDatabaseCommentsLayer();
+            } else {
+                newComment.id = Date.now();
+                globalCommentsMock.unshift(newComment);
+                renderSocialCommentStream();
+            }
+
+            field.value = '';
+            showDashToast("Broadcast packet written safely into network streams.");
         }
 
-        function triggerNodeReaction(id, emoji) {
-            const item = globalCommentsMock.find(c => c.id === id);
-            if(item) {
-                if(!item.reactions[emoji]) item.reactions[emoji] = 0;
-                item.reactions[emoji]++;
+        async function registerReaction(commentId, symbol) {
+            let match = globalCommentsMock.find(c => c.id === commentId);
+            if (!match && typeof commentId === 'number' && globalCommentsMock[commentId]) {
+                match = globalCommentsMock[commentId];
+            }
+            if (match) {
+                if (!match.reactions) match.reactions = { "👍": 0, "🚀": 0, "❤️": 0, "🎉": 0, "🔥": 0 };
+                match.reactions[symbol] = (match.reactions[symbol] || 0) + 1;
+                
+                if (window.supabase && match.user_id) {
+                    await window.supabase.from('dashboard_comments').update({ reactions: match.reactions }).eq('id', match.id);
+                }
                 renderSocialCommentStream();
-                createExplosionBurstParticles();
+                showDashToast(`Registered ${symbol} reaction token.`);
             }
         }
 
-        // --- IMMERSIVE ECOSYSTEM DIGITAL GARDEN CANVAS ANIMATION ENGINE ---
+        // --- INTERACTIVE MAGICAL CANVAS BIOSPHERE ENGINE ---
         function setupInteractiveGardenCanvas() {
             canvas = document.getElementById("garden-canvas");
             if(!canvas) return;
             ctx = canvas.getContext("2d");
             
-            resizeGardenViewport();
-            window.addEventListener("resize", resizeGardenViewport);
+            resizeCanvasBounds();
+            window.addEventListener("resize", resizeCanvasBounds);
 
-            // Seed procedural garden items arrays
+            // Populate initially with gorgeous flora and fauna configurations
             randomizeGardenGrowth();
-
-            // Run core requestAnimationFrame matrix loop
+            
+            // Initiate the high frame-rate rendering loop
             requestAnimationFrame(tickGardenEcosystemFrame);
         }
 
-        function resizeGardenViewport() {
+        function resizeCanvasBounds() {
             if(!canvas) return;
-            const d = canvas.getBoundingClientRect();
-            canvas.width = d.width;
-            canvas.height = 220;
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth || 800;
+            canvas.height = 300;
         }
 
         function randomizeGardenGrowth() {
+            if(!canvas) return;
             flowers = [];
             grassBlades = [];
             butterflies = [];
             ambientParticles = [];
+            birds = [];
+            leaves = [];
 
-            // Seed grass blades with harmonic offset frequencies
-            const bladeCount = Math.floor(window.innerWidth / 8);
-            for(let i = 0; i < bladeCount; i++) {
+            // Seed elegant swaying grass matrices
+            const bladesCount = Math.floor(canvas.width / 5);
+            for (let i = 0; i < bladesCount; i++) {
                 grassBlades.push({
-                    x: (canvas.width / bladeCount) * i + Math.random() * 4,
-                    height: 45 + Math.random() * 35,
-                    bend: Math.random() * 10 - 5,
-                    speed: 0.02 + Math.random() * 0.02,
+                    x: (canvas.width / bladesCount) * i,
+                    height: 50 + Math.random() * 45,
+                    bend: Math.random() * 12 - 6,
+                    speed: 0.015 + Math.random() * 0.02,
                     phase: Math.random() * Math.PI
                 });
             }
 
-            // Seed interactive elegant flowers along timeline plane
-            for(let i = 0; i < 7; i++) {
+            // Seed premium modern blue magical flower layers
+            for (let i = 0; i < 9; i++) {
                 flowers.push({
-                    x: 60 + ((canvas.width - 120) / 6) * i + (Math.random() * 20 - 10),
-                    y: canvas.height - 15,
-                    stemHeight: 60 + Math.random() * 50,
-                    radius: 8 + Math.random() * 6,
-                    color: i % 2 === 0 ? '#2563eb' : '#38bdf8',
-                    petalCount: 5 + Math.floor(Math.random() * 4),
+                    x: 80 + ((canvas.width - 160) / 8) * i + (Math.random() * 30 - 15),
+                    y: canvas.height - 10,
+                    stemHeight: 70 + Math.random() * 60,
+                    radius: 9 + Math.random() * 8,
+                    color: i % 3 === 0 ? '#1e3a8a' : (i % 3 === 1 ? '#2563eb' : '#60a5fa'),
+                    petalCount: 5 + Math.floor(Math.random() * 3),
                     swayOffset: Math.random() * Math.PI
                 });
             }
 
-            // Seed soft ambient butterflies
-            for(let i = 0; i < 4; i++) {
+            // Seed luxury vector butterflies
+            for (let i = 0; i < 5; i++) {
                 butterflies.push({
                     x: Math.random() * canvas.width,
-                    y: 40 + Math.random() * 100,
-                    vx: 0.5 + Math.random() * 1,
-                    vy: Math.random() * 0.6 - 0.3,
+                    y: 50 + Math.random() * 120,
+                    vx: 0.6 + Math.random() * 1.2,
+                    vy: Math.random() * 0.8 - 0.4,
                     wingPhase: Math.random() * Math.PI,
-                    color: '#3b82f6'
+                    color: i % 2 === 0 ? '#3b82f6' : '#93c5fd'
                 });
             }
 
-            // Floating luminous pollen particles
-            for(let i = 0; i < 25; i++) {
+            // Seed floating fireflies / luminous ambient pollen particles
+            for (let i = 0; i < 25; i++) {
                 ambientParticles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    radius: 1 + Math.random() * 2,
-                    alpha: 0.2 + Math.random() * 0.6,
-                    speedY: 0.1 + Math.random() * 0.3,
+                    radius: 1.5 + Math.random() * 2.5,
+                    speedY: -0.2 - Math.random() * 0.4,
+                    alpha: 0.3 + Math.random() * 0.6,
                     phase: Math.random() * Math.PI
                 });
             }
-        }
 
-        function toggleGardenMotion() {
-            animateGarden = !animateGarden;
-            showDashToast(animateGarden ? "Vector fields reactive." : "Biosphere timeline frame paused.");
-        }
+            // Seed soaring majestic flying birds
+            for (let i = 0; i < 3; i++) {
+                birds.push({
+                    x: -50 - (i * 120),
+                    y: 40 + Math.random() * 50,
+                    speedX: 0.8 + Math.random() * 0.6,
+                    amplitude: 3 + Math.random() * 4,
+                    phase: Math.random() * Math.PI
+                });
+            }
 
-        function triggerGardenDancePulse() {
-            gardenPulseFactor = 2.5;
-            createExplosionBurstParticles();
-            showDashToast("Biosphere visual response rhythm pulse forced.");
-        }
-
-        function createExplosionBurstParticles() {
-            for(let i = 0; i < 15; i++) {
-                ambientParticles.push({
+            // Seed drifting leaves falling gracefully
+            for (let i = 0; i < 6; i++) {
+                leaves.push({
                     x: Math.random() * canvas.width,
-                    y: canvas.height - 80,
-                    radius: 2 + Math.random() * 3,
-                    alpha: 1.0,
-                    speedY: -1.5 - Math.random() * 2,
+                    y: Math.random() * canvas.height - 100,
+                    radius: 4 + Math.random() * 4,
+                    speedY: 0.3 + Math.random() * 0.4,
+                    speedX: 0.2 + Math.random() * 0.3,
                     phase: Math.random() * Math.PI
                 });
             }
+
+            showDashToast("Cross-pollination complete: Ambient vectors recalculated.");
         }
 
-        function tickGardenEcosystemFrame(timestamp) {
+        function tickGardenEcosystemFrame() {
             if(!canvas || !ctx) return;
-
+            
+            // Clear Frame cleanly with transparency mappings
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Apply wind vector calculation states based on sine mathematical waves
-            let timeFactor = timestamp * 0.0015;
-            let currentWindBend = Math.sin(timeFactor) * 12;
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            globalTime += 0.02;
 
-            if (!animateGarden) {
-                currentWindBend = 2; // Fixed steady state if tracking is paused
+            // Draw Subtle Stars overlay in Dark Mode configuration
+            if (isDark) {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+                for (let i = 1; i < 6; i++) {
+                    let starX = (canvas.width / 5) * i - 40 + Math.sin(globalTime + i) * 10;
+                    let starY = 30 + Math.cos(globalTime * 0.5 + i) * 5;
+                    ctx.beginPath();
+                    ctx.arc(starX, starY, 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
 
-            // Decay audio pulse factors back gracefully down towards unit baseline values
-            if (gardenPulseFactor > 1.0) {
-                gardenPulseFactor -= 0.04;
-            } else {
-                gardenPulseFactor = 1.0;
-            }
-
-            // Render background skies context indicators
-            cloudOffset += 0.08;
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
+            // Floating Background Clouds
+            if (animateGarden) cloudOffset += 0.15;
+            ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.03)" : "rgba(255, 255, 255, 0.6)";
             ctx.beginPath();
-            ctx.arc(120 + (cloudOffset % canvas.width), 40, 30, 0, Math.PI * 2);
-            ctx.arc(150 + (cloudOffset % canvas.width), 35, 40, 0, Math.PI * 2);
-            ctx.arc(180 + (cloudOffset % canvas.width), 40, 30, 0, Math.PI * 2);
+            ctx.arc(100 + (cloudOffset % (canvas.width + 200)) - 100, 50, 35, 0, Math.PI * 2);
+            ctx.arc(135 + (cloudOffset % (canvas.width + 200)) - 100, 45, 45, 0, Math.PI * 2);
+            ctx.arc(170 + (cloudOffset % (canvas.width + 200)) - 100, 50, 35, 0, Math.PI * 2);
             ctx.fill();
 
-            // 1. Render sway grass array strokes
+            let windBend = Math.sin(globalTime * 0.8) * 5;
+
+            // 1. Render Swaying Grass System
             grassBlades.forEach(blade => {
-                if (animateGarden) {
-                    blade.phase += blade.speed;
-                }
-                let dynamicBend = blade.bend + currentWindBend + (Math.sin(blade.phase) * 4);
+                if (animateGarden) blade.phase += blade.speed;
+                let currentBend = blade.bend + windBend + (Math.sin(blade.phase) * 5);
                 
-                ctx.strokeStyle = '#1e3a8a';
-                ctx.globalAlpha = 0.08;
-                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = isDark ? '#1e3a8a' : '#bfdbfe';
+                ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.moveTo(blade.x, canvas.height);
-                ctx.quadraticCurveTo(blade.x, canvas.height - (blade.height * 0.5), blade.x + (dynamicBend * 0.6), canvas.height - blade.height);
+                ctx.quadraticCurveTo(blade.x, canvas.height - (blade.height * 0.4), blade.x + (currentBend * 0.7), canvas.height - blade.height);
                 ctx.stroke();
             });
 
-            // 2. Render flowers stems and elegant geometric path petals
-            flowers.forEach(flower => {
-                let sway = Math.sin(timeFactor + flower.swayOffset) * 6 * gardenPulseFactor;
-                let topX = flower.x + sway + (currentWindBend * 0.4);
-                let topY = flower.y - flower.stemHeight;
+            // 2. Render Elegant Flowing Trees Structure
+            ctx.strokeStyle = isDark ? 'rgba(30, 58, 138, 0.3)' : 'rgba(37, 99, 235, 0.15)';
+            ctx.lineWidth = 6;
+            [40, canvas.width - 60].forEach(treeX => {
+                ctx.beginPath();
+                ctx.moveTo(treeX, canvas.height);
+                ctx.quadraticCurveTo(treeX + windBend * 0.5, canvas.height - 60, treeX + windBend, canvas.height - 120);
+                ctx.stroke();
+                
+                // Foliage blobs
+                ctx.fillStyle = isDark ? 'rgba(37, 99, 235, 0.1)' : 'rgba(59, 130, 246, 0.15)';
+                ctx.beginPath();
+                ctx.arc(treeX + windBend, canvas.height - 130, 35, 0, Math.PI*2);
+                ctx.fill();
+            });
 
-                // Draw deep modern blue connection stems
-                ctx.strokeStyle = '#3b82f6';
-                ctx.globalAlpha = 0.25;
-                ctx.lineWidth = 2;
+            // 3. Render High-End Geometric Flowers
+            flowers.forEach(flower => {
+                let sway = Math.sin(globalTime + flower.swayOffset) * 7 * gardenPulseFactor;
+                let topX = flower.x + sway + (windBend * 0.5);
+                let topY = flower.y - flower.stemHeight;
+                
+                // Draw Deep Modern Blue Connection Stems
+                ctx.strokeStyle = isDark ? '#2563eb' : '#3b82f6';
+                ctx.lineWidth = 2.5;
                 ctx.beginPath();
                 ctx.moveTo(flower.x, flower.y);
                 ctx.quadraticCurveTo(flower.x + (sway * 0.3), flower.y - (flower.stemHeight * 0.5), topX, topY);
                 ctx.stroke();
 
-                // Draw geometric luxury petals nodes
-                ctx.globalAlpha = 0.85;
+                // Draw Leaves along stem
+                ctx.fillStyle = '#60a5fa';
+                ctx.beginPath();
+                ctx.arc(flower.x + (sway * 0.15), flower.y - (flower.stemHeight * 0.3), 4, 0, Math.PI*2);
+                ctx.fill();
+
+                // Draw Petals nodes completely
                 ctx.fillStyle = flower.color;
-                for(let i = 0; i < flower.petalCount; i++) {
-                    let angle = (Math.PI * 2 / flower.petalCount) * i + (timeFactor * 0.2);
-                    let petalRadius = flower.radius * gardenPulseFactor;
-                    let px = topX + Math.cos(angle) * (petalRadius * 0.9);
-                    let py = topY + Math.sin(angle) * (petalRadius * 0.9);
-                    
+                for (let i = 0; i < flower.petalCount; i++) {
+                    let angle = (i * (Math.PI * 2)) / flower.petalCount + (globalTime * 0.2);
+                    let pX = topX + Math.cos(angle) * flower.radius;
+                    let pY = topY + Math.sin(angle) * flower.radius;
                     ctx.beginPath();
-                    ctx.arc(px, py, petalRadius * 0.6, 0, Math.PI * 2);
+                    ctx.arc(pX, pY, flower.radius * 0.6, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                // Core flower center disk center point highlight
+                // Core Node Center point
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(topX, topY, flower.radius * 0.4, 0, Math.PI * 2);
                 ctx.fill();
             });
 
-            // 3. Update & render ambient butterfly vector systems
-            butterflies.forEach(b => {
+            // 4. Render Drifting Leaves
+            leaves.forEach(leaf => {
                 if (animateGarden) {
-                    b.x += b.vx;
-                    b.y += b.vy + Math.sin(timeFactor * 2) * 0.4;
-                    b.wingPhase += 0.25;
-                    
-                    if(b.x > canvas.width + 20) b.x = -20;
-                    if(b.y < 10 || b.y > canvas.height - 40) b.vy = -b.vy;
+                    leaf.y += leaf.speedY;
+                    leaf.x += Math.sin(globalTime + leaf.phase) * leaf.speedX;
+                    if (leaf.y > canvas.height) { leaf.y = -10; leaf.x = Math.random() * canvas.width; }
                 }
-
-                let wingWidth = 7 * Math.abs(Math.sin(b.wingPhase));
-                ctx.fillStyle = 'rgba(37, 99, 235, 0.7)';
-                ctx.globalAlpha = 0.8;
-                
-                // Draw elegant twin wing path strokes
+                ctx.fillStyle = isDark ? 'rgba(96, 165, 250, 0.3)' : 'rgba(37, 99, 235, 0.25)';
                 ctx.beginPath();
-                ctx.ellipse(b.x - wingWidth, b.y - 3, wingWidth, 6, Math.PI/4, 0, Math.PI*2);
-                ctx.ellipse(b.x + wingWidth, b.y - 3, wingWidth, 6, -Math.PI/4, 0, Math.PI*2);
+                ctx.ellipse(leaf.x, leaf.y, leaf.radius, leaf.radius * 0.5, Math.PI/4 + Math.sin(globalTime), 0, Math.PI*2);
                 ctx.fill();
             });
 
-            // 4. Update & draw particulate micro systems layer
-            ctx.globalAlpha = 1.0;
-            ambientParticles.forEach((p, idx) => {
+            // 5. Render Flapping Vector Butterflies
+            butterflies.forEach(b => {
+                if (animateGarden) {
+                    b.x += b.vx;
+                    b.y += b.vy + Math.sin(globalTime * 2 + b.wingPhase) * 0.3;
+                    b.wingPhase += 0.2;
+                    
+                    if (b.x > canvas.width + 20) b.x = -20;
+                    if (b.y < 20 || b.y > canvas.height - 40) b.vy *= -1;
+                }
+
+                let wingWidth = Math.abs(Math.sin(b.wingPhase * 3)) * 12;
+                ctx.fillStyle = b.color;
+                
+                ctx.beginPath();
+                ctx.ellipse(b.x - 4, b.y, wingWidth, 8, -Math.PI/6, 0, Math.PI * 2);
+                ctx.ellipse(b.x + 4, b.y, wingWidth, 8, Math.PI/6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Butterfly body core
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(b.x - 1, b.y - 5, 2, 10);
+            });
+
+            // 6. Render Soaring Majestic Birds
+            birds.forEach(bird => {
+                if (animateGarden) {
+                    bird.x += bird.speedX;
+                    if (bird.x > canvas.width + 50) { bird.x = -50; bird.y = 40 + Math.random() * 50; }
+                }
+                let birdY = bird.y + Math.sin(globalTime * 1.5 + bird.phase) * bird.amplitude;
+                let flap = Math.sin(globalTime * 5 + bird.phase) * 6;
+                
+                ctx.strokeStyle = isDark ? '#60a5fa' : '#2563eb';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(bird.x - 10, birdY + flap);
+                ctx.quadraticCurveTo(bird.x - 5, birdY - 5, bird.x, birdY);
+                ctx.quadraticCurveTo(bird.x + 5, birdY - 5, bird.x + 10, birdY + flap);
+                ctx.stroke();
+            });
+
+            // 7. Render Luminous Fireflies / Ambient Particles
+            ambientParticles.forEach(p => {
                 if (animateGarden) {
                     p.y += p.speedY;
-                    p.x += Math.sin(timeFactor + p.phase) * 0.2;
-                    
-                    // Recycle fallen or expired elements gracefully back upwards
-                    if (p.y > canvas.height) {
-                        p.y = -5;
-                        p.x = Math.random() * canvas.width;
-                        p.alpha = 0.2 + Math.random() * 0.6;
-                    }
+                    p.x += Math.sin(globalTime + p.phase) * 0.3;
+                    if (p.y < 0) { p.y = canvas.height; p.x = Math.random() * canvas.width; }
                 }
                 
-                ctx.fillStyle = `rgba(37, 99, 235, ${p.alpha})`;
+                ctx.fillStyle = isDark ? `rgba(96, 165, 250, ${p.alpha * (0.5 + Math.sin(globalTime*3)/2)})` : `rgba(37, 99, 235, ${p.alpha})`;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                 ctx.fill();
             });
 
-            // Continuous loop execution synchronization
             requestAnimationFrame(tickGardenEcosystemFrame);
+        }
+
+        function toggleGardenMotion() {
+            animateGarden = !animateGarden;
+            const btn = document.getElementById("btn-toggle-motion");
+            if(btn) {
+                btn.innerText = animateGarden ? "Pause Simulation Vectors" : "Resume Simulation Vectors";
+            }
+            showDashToast(animateGarden ? "Vector fields active." : "Ecosystem vectors frozen safely.");
+        }
+
+        function triggerGardenDancePulse() {
+            gardenPulseFactor = 1.6;
+            showDashToast("High-frequency biosphere resonance pulse emitted.");
+            setTimeout(() => {
+                gardenPulseFactor = 1.0;
+            }, 1500);
+            
+            // If sound is active, trigger an immediate pleasant synthesizer modulation shift
+            if (soundIsPlaying && audioCtx) {
+                let now = audioCtx.currentTime;
+                if(ambientOscillator) ambientOscillator.frequency.setValueAtTime(440, now);
+            }
         }
 
         // --- NON-INTRUSIVE WEB AUDIO API AMBIENT SOUND GENERATION ENGINE ---
         function toggleAmbientSynthesizer() {
             if (!audioCtx) {
-                // Instantiate browser audio processing context ecosystem safely upon explicit interaction
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-
+            
             const btn = document.getElementById('synth-toggle-btn');
-
             if (soundIsPlaying) {
-                // Gracefully sever parameters and cease sound wave oscillation loops
-                if (ambientGainNode) {
-                    ambientGainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+                // Gracefully sever synthesis pipeline lines
+                if(ambientGainNode) {
+                    try { ambientGainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); } catch(e){}
                 }
-                clearInterval(oscillatorIntervalId);
                 setTimeout(() => {
-                    if(ambientOscillator) ambientOscillator.stop();
+                    if (ambientOscillator) { try { ambientOscillator.stop(); } catch(e){} ambientOscillator.disconnect(); }
+                    clearInterval(oscillatorIntervalId);
                     soundIsPlaying = false;
-                    btn.innerText = "Play Frequency";
-                    btn.style.background = "var(--dash-blue-deep)";
-                }, 350);
+                    if(btn) btn.innerText = "Play Ambient Drone";
+                }, 600);
+                showDashToast("Ambient soundscape synthesizer offline.");
             } else {
-                // Initialize premium continuous background modular synth layer node pipeline
+                // Initialize clean futuristic ambient drone chord synthesis
+                soundIsPlaying = true;
+                if(btn) btn.innerText = "Mute Ambient Drone";
+                
                 ambientOscillator = audioCtx.createOscillator();
                 ambientGainNode = audioCtx.createGain();
-
-                // Generate smooth sine harmonic frequencies matching modern blue environments
+                
                 ambientOscillator.type = 'sine';
-                ambientOscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // A3 baseline key signature node
-
-                ambientGainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-                ambientGainNode.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 1.0); // Safe controlled low velocity decibels
-
-                ambientOscillator.connect(ambientGainNode);
+                ambientOscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // A3 Node frequency
+                
+                // Lowpass filter configuration for smooth premium luxury feel
+                let filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+                
+                ambientOscillator.connect(filter);
+                filter.connect(ambientGainNode);
                 ambientGainNode.connect(audioCtx.destination);
                 
-                ambientOscillator.start();
-                soundIsPlaying = true;
-                btn.innerText = "Mute Synth";
-                btn.style.background = "var(--dash-red)";
-
-                // Generate micro pentatonic wind-chime frequencies procedurally down execution queues
+                ambientGainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                ambientGainNode.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 1.5);
+                
+                try { ambientOscillator.start(); } catch(e){}
+                
+                // Build harmonic low frequency arpeggiation sequence loops
+                let notes = [220, 247.94, 293.66, 329.63]; 
+                let step = 0;
                 oscillatorIntervalId = setInterval(() => {
-                    if(!soundIsPlaying || !audioCtx) return;
-                    
-                    const chimeOsc = audioCtx.createOscillator();
-                    const chimeGain = audioCtx.createGain();
-                    
-                    chimeOsc.type = 'triangle';
-                    // Harmonic frequencies mapped explicitly within scale structures (E4, A4, B4, C#5, E5)
-                    const pentatonicBase = [329.63, 440.00, 493.88, 554.37, 659.25];
-                    const targetFreq = pentatonicBase[Math.floor(Math.random() * pentatonicBase.length)];
-                    
-                    chimeOsc.frequency.setValueAtTime(targetFreq, audioCtx.currentTime);
-                    chimeGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                    chimeGain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 2.5);
-                    
-                    chimeOsc.connect(chimeGain);
-                    chimeGain.connect(audioCtx.destination);
-                    
-                    chimeOsc.start();
-                    chimeOsc.stop(audioCtx.currentTime + 2.6);
-                    
-                    // Induce small micro physical reaction pulse down interactive digital landscape array lines
-                    gardenPulseFactor = 1.3;
-                }, 3000);
+                    if(soundIsPlaying && ambientOscillator) {
+                        let now = audioCtx.currentTime;
+                        ambientOscillator.frequency.exponentialRampToValueAtTime(notes[step % notes.length], now + 0.4);
+                        step++;
+                    }
+                }, 4000);
+                
+                showDashToast("Synthesizer running: Emitting 220Hz harmonic drone matrix.");
             }
         }
 
         // --- REAL-TIME PORTAL DATABASE UPDATE ROUTING PIPELINES ---
         function initializeRealtimeTelemetrySync() {
             if(!window.supabase) return;
-
+            
             // Map and attach real-time Postgres event pipeline listener hooks matching index.html core architectures
-            window.supabase.channel('dashboard-live-orders-trigger')
+            realtimeChannelInstance = window.supabase.channel('dashboard-live-orders-trigger')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, async (payload) => {
                     showDashToast("Real-time telemetry manifest change registered. Reloading matrix lines...");
                     await pullFreightOrdersPayload();
-                }).subscribe();
+                })
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dashboard_comments' }, async () => {
+                    await syncDatabaseCommentsLayer();
+                })
+                .subscribe();
+        }
+
+        function handleRealtimeToggleState(checkbox) {
+            if(!window.supabase) return;
+            if(checkbox.checked) {
+                initializeRealtimeTelemetrySync();
+                showDashToast("Real-time telemetry synchronization pipelines online.");
+            } else {
+                if(realtimeChannelInstance) {
+                    window.supabase.removeChannel(realtimeChannelInstance);
+                }
+                showDashToast("Real-time pipelines offline. Standby polling enabled.", true);
+            }
+        }
+
+        // --- GENERAL BUSINESS & TIMELINE UTILITIES ---
+        function calculateBusinessMetrics() {
+            const weight = parseFloat(document.getElementById("calc-weight")?.value || 0);
+            const tier = document.getElementById("calc-tier")?.value || 'standard';
+            const rate = tier === 'express' ? 4.5 : 2.5;
+            const total = weight * rate;
+            
+            const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+            document.getElementById("calc-output-cost").innerText = formatter.format(total);
+        }
+
+        function initializeCountdownWidget() {
+            let hours = 4, minutes = 22, seconds = 11;
+            setInterval(() => {
+                seconds--;
+                if(seconds < 0) { seconds = 59; minutes--; }
+                if(minutes < 0) { minutes = 59; hours--; }
+                if(hours < 0) { hours = 24; }
+                
+                const pad = (num) => String(num).padStart(2, '0');
+                const el = document.getElementById("widget-countdown");
+                if(el) el.innerText = `${pad(hours)}h : ${pad(minutes)}m : ${pad(seconds)}s`;
+            }, 1000);
+        }
+
+        function switchPanel(panelId) {
+            const panels = ['analytics', 'orders', 'social', 'settings'];
+            panels.forEach(p => {
+                const el = document.getElementById(`panel-${p}`);
+                const btn = document.getElementById(`nav-p`);
+                if(el) el.classList.remove('active-panel');
+            });
+            
+            const activePanel = document.getElementById(`panel-${panelId}`);
+            if(activePanel) activePanel.classList.add('active-panel');
+            
+            // Toggle active styles on sidebar buttons
+            document.querySelectorAll('.dash-nav-btn').forEach(b => b.classList.remove('active'));
+            const targetBtn = document.querySelector(`[onclick="switchPanel('${panelId}')"]`);
+            if(targetBtn) targetBtn.classList.add('active');
+        }
+
+        function filterOrdersLog() {
+            const searchVal = document.getElementById('order-search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('order-status-filter').value;
+            
+            const filtered = globalOrdersCache.filter(order => {
+                const title = (order.product_title || '').toLowerCase();
+                const matchesSearch = title.includes(searchVal);
+                const matchesStatus = statusFilter === 'All' || order.status === statusFilter;
+                return matchesSearch && matchesStatus;
+            });
+            renderOrdersTableGrid(filtered);
         }
 
         // --- GENERAL SYSTEM MICRO INTERACTION ALERTS UI UTILITIES ---
@@ -1264,8 +1743,11 @@
             if(!toast) return;
             toast.innerText = message;
             toast.style.borderLeftColor = isAlert ? 'var(--dash-red)' : 'var(--dash-blue-accent)';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 4000);
+            toast.style.background = isAlert ? 'var(--dash-blue-deep)' : 'var(--dash-blue-deep)';
+            toast.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                toast.style.transform = 'translateY(150px)';
+            }, 4500);
         }
 
         async function logoutMainframe() {
